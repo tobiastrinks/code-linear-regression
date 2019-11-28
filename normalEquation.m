@@ -1,5 +1,8 @@
-function [theta] = normalEquation(X, y)
+function [theta] = normalEquation(X, y, lambda)
 
-theta = pinv(X' * X) * X' * y;
+L = eye(size(X, 2));
+L(1, 1) = 0;
+
+theta = pinv(X' * X + lambda * L) * X' * y;
 
 end
