@@ -11,10 +11,12 @@ Sigma = (1 / m) * X' * X;
 
 % choose number of principal components
 k = n;
-variance = 1;
-while variance >= retained_variance
-    variance = sum(S(1:k,:)(:)) / sum(S(1:n,:)(:));
-    k = k - 1;
+if retained_variance
+    variance = 1;
+    while variance >= retained_variance
+        variance = sum(S(1:k,:)(:)) / sum(S(1:n,:)(:));
+        k = k - 1;
+    end
 end
 
 end

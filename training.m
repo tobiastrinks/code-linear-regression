@@ -6,7 +6,7 @@ fprintf('Normalizing features ...\n');
 
 X = [ featureNormalize(X_preprocessed) , X_preprocessed_normalized ];
 
-%visualize(X, y)
+%visualize(X, y);
 
 % --- reducing dimensionality
 retained_variance = 0.99;
