@@ -26,7 +26,7 @@ X_test = X(train_size+1:m, :);
 y_test = y(train_size+1:m, :);
 
 % regularization
-lambda = 1;
+lambda = 0;
 
 %fprintf('Running gradient descent ...\n');
 %alpha = 0.01;
