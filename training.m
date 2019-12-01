@@ -1,9 +1,12 @@
-X_preprocessed = csvread('preprocess/preprocessed_features.csv');
+X = csvread('preprocess/preprocessed_features.csv');
 y = csvread('preprocess/prices.csv');
+
+% --- increase dimensionality
+X = multinom(X, 2);
 
 fprintf('Normalizing features ...\n');
 
-X = featureNormalize(X_preprocessed);
+X = featureNormalize(X);
 
 %visualize(X, y);
 
