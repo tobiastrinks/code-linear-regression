@@ -6,22 +6,24 @@ fprintf('Normalizing features ...\n');
 X = featureNormalize(X_preprocessed);
 
 %visualize(X, y);
-%pause()
 
 % --- reducing dimensionality
-retained_variance = 0.99;
-[U, k] = pca(X, retained_variance);
-fprintf('Reducing dimensionality from %d to %d and retain %d of variance\n', size(X, 2), k, retained_variance);
-Z = (U(:,1:k)'*X')';
-X = Z;
+%retained_variance = 0.99;
+%[U, k] = pca(X, retained_variance);
+%fprintf('Reducing dimensionality from %d to %d and retain %d of variance\n', size(X, 2), k, retained_variance);
+%Z = (U(:,1:k)'*X')';
+%X = Z;
 
 X = [ ones(size(X, 1), 1) , X ];
 
-X_train = X(1:3680, :);
-y_train = y(1:3680, :);
+m = size(X, 1);
+train_size = ceil(m * 0.8);
 
-X_test = X(3681:4600, :);
-y_test = y(3681:4600, :);
+X_train = X(1:train_size, :);
+y_train = y(1:train_size, :);
+
+X_test = X(train_size+1:m, :);
+y_test = y(train_size+1:m, :);
 
 % regularization
 lambda = 1;
@@ -37,13 +39,13 @@ fprintf('Running normal equation ...\n');
 
 [MAE, R2] = measurePerformance(X_test, y_test, theta)
 
-%plotPerformanceInRelationToTrainingSetSize(
-%    @(X, y, lambda) normalEquation(X, y, lambda),
-%    X_train,
-%    y_train,
-%    X_test,
-%    y_test
-%);
+plotPerformanceInRelationToTrainingSetSize(
+    @(X, y, lambda) normalEquation(X, y, lambda),
+    X_train,
+    y_train,
+    X_test,
+    y_test
+);
 
 %figure;
 %plot(1:numel(J_history), J_history, '-b', 'LineWidth', 2);
