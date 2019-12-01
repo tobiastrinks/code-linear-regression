@@ -30,6 +30,7 @@ yr_renovated_mean = housing.yr_renovated[housing.yr_renovated != 0].mean()
 price_mean = housing.price[housing.price != 0].mean()
 
 city_mean_price = [0] * len(housing)
+city_mean_price_at_time = [0] * len(housing)
 years_since_renovated_or_built = [0] * len(housing)
 normalized_sqft_basement = housing.copy()["sqft_basement"]
 normalized_yr_renovated = housing.copy()["yr_renovated"]
@@ -38,11 +39,10 @@ normalized_price = housing.copy()["price"]
 for index, housing_row in housing.iterrows():
     # use mean price per city to identify cheap and expensive cities
     city_mean_price[index] = groupby_statezip_mean_prices[housing_row["statezip"]]
+    # relation between timestamp and city_mean_price to capture economy at point in time for city
+    city_mean_price_at_time[index] = city_mean_price[index] * housing_row["timestamp"]
     # calculate years since renovation or building date -> strong price indicator
-    if housing_row["yr_renovated"] != 0:
-        years_since_renovated_or_built[index] = housing_row.date.year - housing_row["yr_renovated"]
-    else:
-        years_since_renovated_or_built[index] = housing_row.date.year - housing_row["yr_built"]
+    years_since_renovated_or_built[index] = housing_row.date.year - max(housing_row["yr_renovated"], housing_row["yr_built"])
     # set all sqft_basement null values to mean
     if housing_row["sqft_basement"] == 0:
         normalized_sqft_basement[index] = sqft_basement_mean
@@ -53,14 +53,17 @@ for index, housing_row in housing.iterrows():
         normalized_price[index] = price_mean
 
 housing["city_mean_price"] = city_mean_price
+housing["city_mean_price_at_time"] = city_mean_price_at_time
 housing["years_since_renovated_or_built"] = years_since_renovated_or_built
 housing["sqft_basement"] = normalized_sqft_basement
 housing["yr_renovated"] = normalized_yr_renovated
 housing["price"] = normalized_price
 
-housing = housing.drop(columns=["date", "street", "city", "country", "statezip"])
+housing = housing.drop(columns=["date", "street", "city", "country", "statezip", "yr_built", "yr_renovated"])
 
+# -- remove outliers
 housing = housing[((housing.price - housing.price.mean()) / housing.price.std()).abs() < 5]
+housing = housing[((housing.sqft_lot - housing.sqft_lot.mean()) / housing.sqft_lot.std()).abs() < 5]
 
 # -- split features and prices and write them to csv
 prices = housing.iloc[:, 0]
